@@ -1,0 +1,42 @@
+version: '3.9'
+
+networks:
+  ecommerce_network:
+    driver: bridge
+
+services:
+  app:
+    container_name: ecommerce_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=ecommerce_user
+      - DB_PASSWORD=ecommerce_pass
+      - DB_DATABASE=ecommerce_db
+    depends_on:
+      - postgres
+    networks:
+      - ecommerce_network
+
+  postgres:
+    container_name: ecommerce_postgres
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: ecommerce_user
+      POSTGRES_PASSWORD: ecommerce_pass
+      POSTGRES_DB: ecommerce_db
+    ports:
+      - "5433:5432" # Cambiamos el puerto expuesto de la máquina anfitriona a 5433
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce_network
+
+volumes:
+  postgres_data:
+
